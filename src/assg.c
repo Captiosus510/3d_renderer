@@ -16,8 +16,7 @@ void firstMS(FILE* out);
 
 int main(int argc, char *argv[]){
     FILE* inp = fopen(argv[1], "r");
-    FILE* out = fopen(argv[2], "w");
-    if (inp == NULL || out == NULL){
+    if (inp == NULL){
         fprintf(stderr, "ERROR: input.txt does not exist.\n");
         exit(EXIT_FAILURE);
     }
@@ -62,6 +61,12 @@ int main(int argc, char *argv[]){
         addSphere(&world, newSphere);
     }
     fclose(inp);
+
+    FILE* out = fopen(argv[2], "w");
+    if (out == NULL){
+        fprintf(stderr, "ERROR: output.txt does not exist.\n");
+        exit(EXIT_FAILURE);
+    }
     firstMS(out);
     fclose(out);
 
