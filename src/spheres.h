@@ -3,8 +3,6 @@
 #ifndef SPHERES_H
 #define SPHERES_H
 
-#include "vector.h"
-
 typedef struct {
     float r;
     Vec3 pos;
