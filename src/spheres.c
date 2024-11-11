@@ -1,4 +1,5 @@
-#include "vector.h"
+#include <stdlib.h>
+#include <stdio.h>
 #include "spheres.h"
 
 void worldInit(World *world){

@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
 #ifndef SPHERES_H
 #define SPHERES_H
+
+#include "vector.h"
 
 typedef struct {
     float r;
