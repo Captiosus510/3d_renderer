@@ -152,8 +152,8 @@ void output(FILE* out){
 void output(FILE* out){
     float x_inc = vw/imw; // set the x increment to be partitioned by num of width pixels
     float y_inc = vh/imh; // set the y increment to be paritition by num of height pixels
-    float x_start = -vw/2;
-    float y_start = vh/2;
+    float x_start = -vw/2 + x_inc/2;
+    float y_start = vh/2-y_inc/2;
     float t;
     Vec3 rayPos = {0, 0, 0}; // ray always starts where camera is, and camera is always at 0,0,0
     Vec3 rayDir = {0, 0, -focal}; //intialize direction vector of the ray, set it to begin rendering at the top left of the image
