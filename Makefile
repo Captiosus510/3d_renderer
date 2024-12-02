@@ -1,10 +1,11 @@
 all: MS1 MS2 FS
 
 # Executables
-MS1: assg.o spheres.o vector.o
-	gcc -Wall -Werror -std=c99 -o MS1_assg assg.o spheres.o vector.o -lm
+MS1: assg_MS1.o spheres.o vector.o
+	gcc -Wall -Werror -std=c99 -DMS1 -o MS1_assg assg_MS1.o spheres.o vector.o -lm
 	
-MS2: # TODO ...
+MS2: vector.o spheres.o assg_MS2.o color.o
+	gcc -Wall -Werror -std=c99 -DMS2 -o MS2_assg assg_MS2.o spheres.o vector.o color.o -lm
 
 FS: # TODO ...
 
@@ -17,8 +18,14 @@ vector.o: src/vector.c src/vector.h
 spheres.o: src/spheres.c src/spheres.h src/vector.h
 	gcc -Wall -Werror -std=c99 -c src/spheres.c
 
-assg.o: src/vector.h src/spheres.h src/assg.c
-	gcc -Wall -Werror -std=c99 -c src/assg.c
+assg_MS1.o: src/vector.h src/spheres.h src/assg.c
+	gcc -Wall -Werror -std=c99 -DMS1 -c src/assg.c -o assg_MS1.o -lm
+
+assg_MS2.o: src/vector.h src/spheres.h src/assg.c src/color.h
+	gcc -Wall -Werror -std=c99 -DMS2 -c src/assg.c -o assg_MS2.o -lm
+
+color.o: src/color.h src/color.c src/vector.h
+	gcc -Wall -Werror -std=c99 -c src/color.c
 
 clean:
 	rm -f *.o

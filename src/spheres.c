@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "spheres.h"
 
 void worldInit(World *world){
@@ -42,3 +43,40 @@ Sphere *createSphere(float radius, Vec3 position, Vec3 color){
     newSphere->color=color;
     return newSphere;
 }
+
+float calcDiscriminant(float a, float b, float c){
+    return b*b-4*a*c;
+}
+void solveQuadratic(float a, float b, float c, float disc, float *t1, float *t2){
+    *t1 = (-b + sqrt(disc))/(2*a);
+    *t2 = (-b - sqrt(disc))/(2*a);
+}
+float min(float t1, float t2){
+    return (t1 > t2) ? t2 : t1;
+}
+int doesIntersect(const Sphere *sphere, Vec3 rayPos, Vec3 rayDir, float *t){
+    float a, b, c, t1, t2;
+    Vec3 V = subtract(rayPos, sphere->pos);
+    a = dot(rayDir, rayDir);
+    b = 2*dot(rayDir, V);
+    c = dot(V, V) - sphere->r * sphere->r;
+
+    float disc = calcDiscriminant(a, b, c);
+    if (disc < 0){
+        return 0;
+    }else{
+        solveQuadratic(a, b, c, disc, &t1, &t2);
+        if (t1 < 0 && t2 < 0){
+            return 0;
+        }else if(t1 > 0 && t2 < 0){
+            *t = t1;
+        }else if(t1 < 0 && t2 > 0){
+            *t = t2;
+        }else{
+            *t = min(t1, t2);
+        }
+        return 1;
+    }
+
+}
+
