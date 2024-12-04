@@ -7,20 +7,21 @@
 #include "color.h"
 #define HEX_STR_SIZE 8
 #define SHADOWFACTOR 0.1
+#define ANTIALIASING 9
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
-
 
 //initialize all vars as global variables
 int imw, imh, num_colors, m, bg_ind, n;
 float vh, vw, focal, brightness;
 Vec3 light;
 World world;
-char** colors;
+unsigned int* colors;
 
 void output(FILE* out);
 Vec3 calcColor(Sphere* sphere, Vec3 light_pos, float brightness, Vec3 rayPos, Vec3 rayDir, float t);
+Vec3 pixelColor(Vec3 rayPos, Vec3 rayDir, Vec3 bg_col);
 
 int main(int argc, char *argv[]){
     FILE* inp = fopen(argv[1], "r");
@@ -34,25 +35,23 @@ int main(int argc, char *argv[]){
     fscanf(inp, "%f %f %f %f", &light.x, &light.y, &light.z, &brightness); // get information about the light source
 
     fscanf(inp, "%d", &m); // get number of colors then allocate space for it
-    colors = malloc(m*sizeof(char*));
+    colors = malloc(m*sizeof(unsigned int));
     if (colors == NULL){
         fprintf(stderr, "ERROR: No available space\n");
+        fclose(inp);
         exit(EXIT_FAILURE);
     }
     // put all colors in colors array
     for (int i=0; i<m; i++){
-        char hex[HEX_STR_SIZE+1];
-        fscanf(inp, "%s", hex);
-
-        colors[i] = malloc(HEX_STR_SIZE+1);
-        if (colors[i] == NULL){
-            fprintf(stderr, "ERROR: No available space\n");
+        if (fscanf(inp, "%x", &colors[i]) != 1) {
+            fprintf(stderr, "ERROR: Invalid color format\n");
+            free(colors);
+            fclose(inp);
             exit(EXIT_FAILURE);
         }
-
-        strcpy(colors[i], hex);
     }
-
+    //sort list based on compaarison function
+    qsort(colors, m, sizeof(unsigned int), compareColor);
     fscanf(inp, "%d %d", &bg_ind, &n); // get bg index and num of spheres
     // initialize world
     worldInit(&world);
@@ -63,8 +62,12 @@ int main(int argc, char *argv[]){
         &x, &y, &z, 
         &r, &color_ind);
         Vec3 pos = {x, y, z};
+        #ifndef FS
         // milestone 1 color
         Vec3 color = {1.0f, 1.0f, 1.0f};
+        #else
+        Vec3 color = unpackRGB(colors[color_ind]);
+        #endif
         Sphere* newSphere = createSphere(r, pos, color);
         addSphere(&world, newSphere);
     }
@@ -79,9 +82,6 @@ int main(int argc, char *argv[]){
     fclose(out);
 
     freeWorld(&world);
-    for (int i=0; i<m; i++){
-        free(colors[i]);
-    }
     free(colors);
 
     return 0;
@@ -188,6 +188,95 @@ void output(FILE* out){
         }
         fprintf(out, "\n");
     }
+}
+
+Vec3 calcColor(Sphere* sphere, Vec3 light_pos, float brightness, Vec3 rayPos, Vec3 rayDir, float t){
+    Vec3 p = add(rayPos, scalarMultiply(t, rayDir)); // intersection point vector
+    Vec3 n = normalize(subtract(p, sphere->pos)); // normal at the intersectionn point
+    Vec3 d = normalize(subtract(light_pos, p));
+    Vec3 pixel_col;
+
+    float I0 = brightness*(MAX(dot(d, n), 0)/distance2(light, p));
+    float I = MIN(I0, 1);
+    
+    pixel_col = scalarMultiply(I, sphere->color);
+
+    Vec3 shadow_point = add(p, scalarMultiply(0.001, n));
+    Vec3 shadow_dir = subtract(light_pos, shadow_point);
+    float a;
+    for (Sphere **ptr = world.spheres; ptr < world.spheres+world.size; ptr++){
+        if (doesIntersect(*ptr, shadow_point, shadow_dir, &a)){
+            pixel_col = scalarMultiply(SHADOWFACTOR, pixel_col);
+            break;
+        }
+    }
+
+    return pixel_col;
+}
+#endif
+
+#ifdef FS
+void output(FILE* out) {
+    float x_inc = vw / imw; // Width increment
+    float y_inc = vh / imh; // Height increment
+    float x_start = -vw / 2 + x_inc / 3; // Top-left x-coordinate
+    float y_start = vh / 2 - y_inc / 3;  // Top-left y-coordinate
+    int sample_num = (int)sqrt(ANTIALIASING); // Anti-aliasing sample count per axis
+
+    Vec3 rayPos = {0, 0, 0};          // Camera position
+    Vec3 bg_col = unpackRGB(colors[bg_ind]); // Background color
+    
+
+    // Initialize the PPM file
+    fprintf(out, "P3\n");
+    fprintf(out, "%d %d\n", imw, imh);
+    fprintf(out, "255\n");
+
+    // Iterate through each pixel
+    for (int i = 0; i < imh; i++) {
+        for (int j = 0; j < imw; j++) {
+            Vec3 totalRGB = {0, 0, 0};
+
+            // Compute anti-aliasing samples
+            for (int sample_row = 0; sample_row < sample_num; sample_row++) {
+                for (int sample_col = 0; sample_col < sample_num; sample_col++) {
+                    Vec3 rayDir = {
+                        x_start + j * x_inc + sample_col * x_inc / sample_num,
+                        y_start - i * y_inc - sample_row * y_inc / sample_num,
+                        -focal
+                    };
+
+                    rayDir = normalize(rayDir);
+                    Vec3 pixel_col = pixelColor(rayPos, rayDir, bg_col);
+                    totalRGB = add(totalRGB, pixel_col);
+                }
+            }
+
+            Vec3 final_color = scalarDivide(totalRGB, sample_num*sample_num);
+            writeColour(out, final_color);
+        }
+        fprintf(out, "\n");
+    }
+}
+
+Vec3 pixelColor(Vec3 rayPos, Vec3 rayDir, Vec3 bg_col){
+    Vec3 pixel_col;
+    float t;
+    float closest_t = INFINITY;
+    Sphere *closest_sphere = NULL;
+    for (Sphere **ptr = world.spheres; ptr < world.spheres+world.size; ptr++){
+        if (doesIntersect(*ptr, rayPos, rayDir, &t) && t < closest_t){
+            closest_t = t;
+            closest_sphere = *ptr;
+        }
+    }
+    if (closest_sphere){
+        pixel_col = calcColor(closest_sphere, light, brightness, rayPos, rayDir, closest_t);
+    }
+    else {
+        pixel_col = bg_col;
+    }
+    return pixel_col;
 }
 
 Vec3 calcColor(Sphere* sphere, Vec3 light_pos, float brightness, Vec3 rayPos, Vec3 rayDir, float t){
