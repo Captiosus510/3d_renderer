@@ -252,7 +252,7 @@ void output(FILE* out) {
                 }
             }
 
-            Vec3 final_color = scalarDivide(totalRGB, sample_num*sample_num);
+            Vec3 final_color = scalarDivide(totalRGB, 1.0*sample_num*sample_num);
             writeColour(out, final_color);
         }
         fprintf(out, "\n");

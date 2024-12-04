@@ -13,9 +13,9 @@ Vec3 unpackRGB(unsigned int packedRGB){
     return color;
 }
 void writeColour(FILE *ppmFile, Vec3 color){
-    int r = (int)(color.x * 255.0f + 0.5f);
-    int g = (int)(color.y * 255.0f + 0.5f);
-    int b = (int)(color.z * 255.0f + 0.5f);
+    int r = (int)(color.x * 255.0f);
+    int g = (int)(color.y * 255.0f);
+    int b = (int)(color.z * 255.0f);
     fprintf(ppmFile, "%d %d %d ", r, g, b);
 }
 
