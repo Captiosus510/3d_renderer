@@ -1,4 +1,4 @@
-all: MS1 MS2 FS
+all: MS1 MS2 FS clean
 
 # Executables
 MS1: assg_MS1.o spheres.o vector.o color.o

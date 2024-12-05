@@ -219,9 +219,9 @@ Vec3 calcColor(Sphere* sphere, Vec3 light_pos, float brightness, Vec3 rayPos, Ve
 void output(FILE* out) {
     float x_inc = vw / imw; // Width increment
     float y_inc = vh / imh; // Height increment
-    float x_start = -vw / 2 + x_inc / 3; // Top-left x-coordinate
-    float y_start = vh / 2 - y_inc / 3;  // Top-left y-coordinate
     int sample_num = (int)sqrt(ANTIALIASING); // Anti-aliasing sample count per axis
+    float x_start = -vw / 2 + x_inc / (float) (sample_num*2); // Top-left x-coordinate
+    float y_start = vh / 2 - y_inc / (float) (sample_num*2);  // Top-left y-coordinate
 
     Vec3 rayPos = {0, 0, 0};          // Camera position
     Vec3 bg_col = unpackRGB(colors[bg_ind]); // Background color
@@ -241,8 +241,8 @@ void output(FILE* out) {
             for (int sample_row = 0; sample_row < sample_num; sample_row++) {
                 for (int sample_col = 0; sample_col < sample_num; sample_col++) {
                     Vec3 rayDir = {
-                        x_start + j * x_inc + sample_col * x_inc / sample_num,
-                        y_start - i * y_inc - sample_row * y_inc / sample_num,
+                        x_start + j * x_inc + sample_row * x_inc / (float) sample_num,
+                        y_start - i * y_inc - sample_col * y_inc / (float) sample_num,
                         -focal
                     };
 
@@ -285,7 +285,7 @@ Vec3 calcColor(Sphere* sphere, Vec3 light_pos, float brightness, Vec3 rayPos, Ve
     Vec3 d = normalize(subtract(light_pos, p));
     Vec3 pixel_col;
 
-    float I0 = brightness*(MAX(dot(d, n), 0)/distance2(light, p));
+    float I0 = (float) (brightness)*(MAX(dot(d, n), 0)/distance2(light, p));
     float I = MIN(I0, 1);
     
     pixel_col = scalarMultiply(I, sphere->color);
@@ -294,9 +294,8 @@ Vec3 calcColor(Sphere* sphere, Vec3 light_pos, float brightness, Vec3 rayPos, Ve
     Vec3 shadow_dir = subtract(light_pos, shadow_point);
     float a;
     for (Sphere **ptr = world.spheres; ptr < world.spheres+world.size; ptr++){
-        if (doesIntersect(*ptr, shadow_point, shadow_dir, &a)){
-            pixel_col = scalarMultiply(SHADOWFACTOR, pixel_col);
-            break;
+        if (doesIntersect(*ptr, shadow_point, shadow_dir, &a) && a < 1){
+            return scalarMultiply(SHADOWFACTOR, pixel_col);
         }
     }
 
