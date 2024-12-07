@@ -51,7 +51,9 @@ int main(int argc, char *argv[]){
         }
     }
     //sort list based on compaarison function
+    #ifndef MS1
     qsort(colors, m, sizeof(unsigned int), compareColor);
+    #endif
     fscanf(inp, "%d %d", &bg_ind, &n); // get bg index and num of spheres
     // initialize world
     worldInit(&world);
@@ -205,7 +207,7 @@ Vec3 calcColor(Sphere* sphere, Vec3 light_pos, float brightness, Vec3 rayPos, Ve
     Vec3 shadow_dir = subtract(light_pos, shadow_point);
     float a;
     for (Sphere **ptr = world.spheres; ptr < world.spheres+world.size; ptr++){
-        if (doesIntersect(*ptr, shadow_point, shadow_dir, &a)){
+        if (doesIntersect(*ptr, shadow_point, shadow_dir, &a) && a<1){
             pixel_col = scalarMultiply(SHADOWFACTOR, pixel_col);
             break;
         }
