@@ -1,0 +1,85 @@
+--------------------------------------------------------------------------------
+START
+--------------------------------------------------------------------------------
+Check script passed. Marking on 50%-100%
+--------------------------------------------------------------------------------
+Marking makefile
+Testing MS1_assg
+MS1 works correctly
+Testing MS2_assg
+PPMCMP: 0.0
+MS2 works correctly
+Testing FS_assg
+PPMCMP: 0.0
+FS works correctly
+All executables were created (regardless of functionality)
+
+
+Marking 'FS'...
+Searching for test cases for: FS
+10 test cases found for 'FS' in '~/markcases'
+'assg_FS' compiled successfully.
+
+Testing using '~/markcases/12_input.txt'...
+PPMCMP: 0.008714736439287663
+Success: output is correct
+No memory leaks
+Giving full marks
+
+Testing using '~/markcases/13_input.txt'...
+PPMCMP: 0.0
+Success: output is correct
+No memory leaks
+Giving full marks
+
+Testing using '~/markcases/11_input.txt'...
+PPMCMP: 0.002365241525694728
+Success: output is correct
+No memory leaks
+Giving full marks
+
+Testing using '~/markcases/111_input.txt'...
+PPMCMP: 0.0
+Success: output is correct
+No memory leaks
+Giving full marks
+
+Testing using '~/markcases/16_input.txt'...
+PPMCMP: 0.007729983422905207
+Success: output is correct
+No memory leaks
+Giving full marks
+
+Testing using '~/markcases/110_input.txt'...
+PPMCMP: 0.0012645762180909514
+Success: output is correct
+No memory leaks
+Giving full marks
+
+Testing using '~/markcases/14_input.txt'...
+PPMCMP: 0.0027843068819493055
+Success: output is correct
+No memory leaks
+Giving full marks
+
+Testing using '~/markcases/15_input.txt'...
+PPMCMP: 0.0008221212192438543
+Success: output is correct
+No memory leaks
+Giving full marks
+
+Testing using '~/markcases/19_input.txt'...
+PPMCMP: 0.07934777438640594
+Success: output is correct
+No memory leaks
+Giving full marks
+
+Testing using '~/markcases/18_input.txt'...
+PPMCMP: 0.0
+Success: output is correct
+No memory leaks
+Giving full marks
+--------------------------------------------------------------------------------
+END: Final grade: 14/14 = 100%
+--------------------------------------------------------------------------------
+
