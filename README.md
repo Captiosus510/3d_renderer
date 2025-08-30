@@ -1,6 +1,6 @@
 # 3D Ray Tracing Renderer in C
 
-This is a personal project to create a 3D ray tracing renderer from scratch in C, using the `raylib` library for windowing and input. The renderer is capable of rendering scenes with spheres, lighting, shadows, and anti-aliasing.
+This is a personal project to create a 3D ray tracing renderer from scratch in C, using the `raylib` library for windowing and input. The renderer is capable of rendering scenes with spheres, lighting, shadows, and anti-aliasing. This project was originally started as an assignment for CMPUT 201 at the University of Alberta.
 
 <img src="assets/main.png" />
 
@@ -45,6 +45,22 @@ This is a personal project to create a 3D ray tracing renderer from scratch in C
 *   **Left Shift**: Move down
 
 ## How to Use
+
+### Cloning
+
+This repository uses `raylib` as a git submodule. To clone the repository and its submodules, use the following command:
+
+```bash
+git clone --recurse-submodules https://github.com/Captiosus510/3d_renderer.git
+```
+
+If you have already cloned the repository without the submodules, you can initialize them with:
+
+```bash
+git submodule update --init --recursive
+```
+
+### Building and Running
 
 1.  **Compile the project:**
     ```bash
