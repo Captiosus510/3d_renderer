@@ -4,6 +4,10 @@ This is a personal project to create a 3D ray tracing renderer from scratch in C
 
 <img src="assets/main.png" />
 
+## Acknoweldgements
+
+Credit to Henry Tang and the CMPUT 201 TA team for the base project idea and some of the visualizations and explanations priovided below. Credit to them as well for generating some of the testcases that are still present in the project.
+
 ## Table of Contents
 
 - [**Features**](#features)
@@ -229,6 +233,8 @@ Where:
 - $\vec{n}$ is the surface normal at the intersection point
 - $\vec{l}$ is the light position
 - $\vec{p}$ is the intersection point
+
+This essentially means that the light intensity is based on it's brightness, how close the reflecting ray is to pointing at the light source, and the distance the intersection point is away from the object. The intensity is directly proportional to brightness and closeness in direction and inversely proportional to distance.
 
 ### Casting Shadows onto Surfaces
 
